@@ -157,7 +157,8 @@ impl eframe::App for CardCreator {
                             self.logs.push_str("No deck selected\n");
                             return;
                         }
-
+                        let now = std::time::Instant::now();
+                        
                         self.word = self.word_cleaner_regex.replace_all(&self.word, "").to_string();
 
                         let _card = ankiconnect::create_card(
@@ -177,10 +178,11 @@ impl eframe::App for CardCreator {
                         }
 
                         let anki_response = self.anki_client.add_card_to_deck(&_card.unwrap());
+                        let elapsed = now.elapsed();
 
                         match anki_response {
                             Ok(_) => {
-                                self.logs.push_str(format!("Added word {} to deck {}\n", self.word, self.selected_deck).as_str());
+                                self.logs.push_str(format!("Added word {} to deck {} [{:?}]\n", self.word, self.selected_deck, elapsed).as_str());
                             },
                             Err(_error) => {
                                 self.logs.push_str(format!("{:?}\n", _error).as_str());
